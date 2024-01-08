@@ -9,11 +9,11 @@ LABELS = ['backheel', 'laces_shot', 'volley_shot', 'scorpion_shot', 'toe_shot']
 
 
 # El número de pasos dentro de un segmento de tiempo
-TIME_PERIODS = 80
+TIME_PERIODS = 120       
 
 # Los pasos a dar de un segmento al siguiente; si este valor es igual a
 # TIME_PERIODS, entonces no hay solapamiento entre los segmentos
-STEP_DISTANCE = 40
+STEP_DISTANCE = 6
 
 # al haber solapamiento aprovechamos más los datos
 
@@ -153,7 +153,8 @@ df_test = df[df['user-id'] < 2]
 df_train = df[df['user-id'] >= 2]
 
 #y=df.loc[:, "activity"].to_numpy()
-#df_train, df_test = train_test_split(df, test_size=0.2,shuffle=True,stratify=y,random_state=5)
+#print(y)
+#df_train, df_test = train_test_split(df, test_size=0.2,shuffle=True,stratify=y,random_state=35)
 
 print("Entrenamiento", df_train.shape)
 print("Test", df_test.shape)
@@ -211,6 +212,7 @@ print('y_train shape: ', y_train.shape)
 
 num_time_periods, num_sensors = x_train.shape[1], x_train.shape[2]
 num_classes = le.classes_.size
+print(num_sensors)
 print(list(le.classes_))
 
 #%% transformamos los datos a flotantes
@@ -237,12 +239,11 @@ from keras.layers import Dense, Dropout
 from keras.layers import Conv1D, MaxPooling1D, GlobalAveragePooling1D
 
 model_m = Sequential()
-model_m.add(Conv1D(100, 10, activation='relu', input_shape=(TIME_PERIODS, 
-                                                            num_sensors)))
-model_m.add(Conv1D(100, 10, activation='relu'))
+model_m.add(Conv1D(64, 7, activation='relu', input_shape=(TIME_PERIODS, num_sensors)))
+model_m.add(Conv1D(64, 7, activation='relu'))
 model_m.add(MaxPooling1D(3))
-model_m.add(Conv1D(160, 10, activation='relu'))
-model_m.add(Conv1D(160, 10, activation='relu'))
+model_m.add(Conv1D(128, 10, activation='relu'))
+model_m.add(Conv1D(128, 10, activation='relu'))
 model_m.add(GlobalAveragePooling1D())
 model_m.add(Dropout(0.5))
 model_m.add(Dense(num_classes, activation='softmax'))
@@ -265,7 +266,7 @@ model_m.compile(loss='categorical_crossentropy',
 
 #%% Entrenamiento
 
-BATCH_SIZE = 400
+BATCH_SIZE = 200
 EPOCHS = 50
 
 history = model_m.fit(x_train,
